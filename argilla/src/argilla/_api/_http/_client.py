@@ -34,10 +34,11 @@ def create_http_client(api_url: str, api_key: str, **client_args) -> httpx.Clien
     headers = client_args.pop("headers", {})
     headers["X-Argilla-Api-Key"] = api_key
     retries = client_args.pop("retries", 0)
-
+    verify = client_args.pop("verify", True)
+    
     return httpx.Client(
         base_url=api_url,
         headers=headers,
-        transport=httpx.HTTPTransport(retries=retries),
+        transport=httpx.HTTPTransport(retries=retries, verify=verify),
         **client_args,
     )
