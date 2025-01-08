@@ -84,12 +84,6 @@ class DatasetMetrics(BaseModel):
     responses: ResponseMetrics
 
 
-class DatasetProgress(BaseModel):
-    total: int
-    completed: int
-    pending: int
-
-
 class RecordResponseDistribution(BaseModel):
     submitted: int = 0
     discarded: int = 0
@@ -100,6 +94,15 @@ class UserProgress(BaseModel):
     username: str
     completed: RecordResponseDistribution = RecordResponseDistribution()
     pending: RecordResponseDistribution = RecordResponseDistribution()
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DatasetProgress(BaseModel):
+    total: int
+    completed: int
+    pending: int
+    users: List[UserProgress] = Field(default_factory=list)
 
 
 class UsersProgress(BaseModel):
@@ -193,3 +196,11 @@ class HubDataset(BaseModel):
     subset: str
     split: str
     mapping: HubDatasetMapping
+
+
+class HubDatasetExport(BaseModel):
+    name: str = Field(..., min_length=1)
+    subset: Optional[str] = Field("default", min_length=1)
+    split: Optional[str] = Field("train", min_length=1)
+    private: Optional[bool] = False
+    token: str = Field(..., min_length=1)

@@ -24,9 +24,8 @@ from argilla._models import RecordModel
 
 
 @pytest.fixture
-def dataset(client: rg.Argilla) -> rg.Dataset:
+def dataset(client: rg.Argilla, dataset_name: str) -> rg.Dataset:
     workspace = client.workspaces[0]
-    mock_dataset_name = "".join(random.choices(ascii_lowercase, k=16))
     settings = rg.Settings(
         allow_extra_metadata=True,
         fields=[
@@ -37,13 +36,43 @@ def dataset(client: rg.Argilla) -> rg.Dataset:
         ],
     )
     dataset = rg.Dataset(
-        name=mock_dataset_name,
+        name=dataset_name,
         workspace=workspace.name,
         settings=settings,
         client=client,
     )
     dataset.create()
     return dataset
+
+
+class TestUpdateRecords:
+    def test_update_records_fields(self, client: rg.Argilla, dataset: rg.Dataset):
+        mock_data = [
+            {
+                "text": "Hello World, how are you?",
+                "label": "negative",
+                "id": uuid.uuid4(),
+            },
+            {
+                "text": "Hello World, how are you?",
+                "label": "negative",
+                "id": uuid.uuid4(),
+            },
+            {
+                "text": "Hello World, how are you?",
+                "label": "negative",
+                "id": uuid.uuid4(),
+            },
+        ]
+
+        dataset.records.log(records=mock_data)
+
+        updated_mock_data = [{"text": "New text", "id": r["id"]} for r in mock_data]
+
+        dataset.records.log(records=updated_mock_data)
+
+        for record in dataset.records():
+            assert record.fields["text"] == "New text"
 
 
 class TestUpdateSuggestions:

@@ -11,8 +11,10 @@ export default {
   search: "Search",
   searchPlaceholder: "Introduce a query",
   searchDatasets: "Search datasets",
+  share: "Share progress",
   expand: "Expand",
   copied: "Copied",
+  copiedToClipboard: "Copied to clipboard",
   copyLink: "Copy link",
   copyRecord: "Copy record",
   refresh: "Refresh",
@@ -23,6 +25,7 @@ export default {
   description: "Description",
   labels: "Labels",
   order: "Order",
+  owner: "Owner",
   useMarkdown: "Use Markdown",
   suggestionFirst: "Show suggestions first",
   visibleForAnnotators: "Visible for annotators",
@@ -42,6 +45,11 @@ export default {
   required: "Required",
   optional: "Optional",
   template: "Template",
+  orgOrUsername: "Organization or username",
+  hfToken: "Hugging Face token",
+  private: "Is private",
+  rows: "rows",
+  datasetName: "Dataset name",
   noRecordsMessages: {
     datasetEmptyForAnnotator:
       "The dataset is empty. Ask an administrator to upload records and come back soon.",
@@ -120,6 +128,7 @@ export default {
     cancel: "Cancel",
     continue: "Continue",
     delete: "Delete",
+    exportToHub: "Push to Hub",
     tooltip: {
       copyToClipboard: "Copy to clipboard",
       copyNameToClipboard: "Copy dataset name to clipboard",
@@ -224,6 +233,7 @@ export default {
   filters: "Filters",
   filterBy: "Filter by...",
   fields: "Fields",
+  field: "Field",
   questions: "Questions",
   general: "General",
   metadata: "Metadata",
@@ -244,21 +254,16 @@ export default {
   youAreOffline: "You are offline",
   write: "Write",
   preview: "Preview",
-  datasetTable: {
-    name: "Dataset",
-    workspace: "Workspace",
-    createdAt: "Created",
-    lastActivityAt: "Updated",
-    progress: "Team progress",
-  },
   metrics: {
     total: "Total",
     progress: {
+      default: "Progress",
       my: "My Progress",
       team: "Team progress",
     },
   },
   home: {
+    zeroDatasetsFound: "0 datasets found",
     argillaDatasets: "Your datasets",
     none: "None yet",
     importTitle: "Import a dataset from Hugging Face Hub",
@@ -276,6 +281,9 @@ export default {
     pasteRepoIdPlaceholder: "Paste a repo id e.g., stanfordnlp/imdb",
     demoLink:
       "Log into this <a href='https://huggingface.co/spaces/argilla/argilla-template-space' target='_blank'>demo</a> to try Argilla out",
+    name: "Dataset name",
+    updatedAt: "Updated",
+    createdAt: "Created",
   },
   datasetCreation: {
     questions: {
@@ -286,6 +294,9 @@ export default {
       },
       rating: {
         atLeastTwoOptions: "At least two options are required",
+      },
+      span: {
+        fieldRelated: "One text field is required",
       },
     },
     atLeastOneQuestion: "At least one question is required.",
@@ -306,6 +317,7 @@ export default {
     requiredQuestion: "Required question",
     select: "Select",
     mapToColumn: "Map to column",
+    applyToaAField: "Annotate spans on:",
     subset: "Subset",
     selectSubset: "Your can create a dataset from only one subset.",
     preview: "Preview",
@@ -315,6 +327,21 @@ export default {
     none: "None",
     noWorkspaces:
       "Please, follow this <a target='_blank' href='https://docs.argilla.io/latest/how_to_guides/workspace/#create-a-new-workspace'>guide</a> to create a workspace",
+  },
+  exportToHub: {
+    dialogTitle: "Push to Hugging Face Hub",
+    ownerTooltip: "Use a valid Hugging Face username or organisation",
+    tokenTooltip: `Use an existing access token or create a <a href='https://huggingface.co/settings/tokens' target='_blank'>new token</a> with "write permission"`,
+    validations: {
+      orgOrUsernameIsRequired: "Organization or username is required",
+      hfTokenIsRequired: "Hugging Face token is required",
+      hfTokenInvalid: "Invalid Hugging Face token",
+      datasetNameIsRequired: "Dataset name is required",
+    },
+    exporting: "Exporting to Hugging Face hub",
+    private: "Private dataset",
+    public: "Public dataset",
+    exportingWarning: "This might take a few seconds",
   },
   config: {
     field: {

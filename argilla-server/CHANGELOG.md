@@ -16,6 +16,19 @@ These are the section headers that we use:
 
 ## [Unreleased]()
 
+## [2.6.0](https://github.com/argilla-io/argilla/compare/v2.5.0...v2.6.0)
+
+### Added
+
+- Added new `POST /api/v1/datasets/:dataset_id/export` endpoint to export datasets to Hugging Face Hub using a background job. ([#5709](https://github.com/argilla-io/argilla/pull/5709))
+- Added support to update record fields in `PATCH /api/v1/records/:record_id` endpoint. ([#5685](https://github.com/argilla-io/argilla/pull/5685))
+- Added support to update record fields in `PUT /api/v1/datasets/:dataset_id/records/bulk` endpoint. ([#5685](https://github.com/argilla-io/argilla/pull/5685))
+- Added `GET /share-your-progress` endpoint to share user progress with the community. ([#5739](https://github.com/argilla-io/argilla/pull/5739))
+- Added `argilla.share_your_progress_enabled` attribute to `GET /api/v1/settings` endpoint. ([#5739](https://github.com/argilla-io/argilla/pull/5739))
+- Added new environment variable `ARGILLA_ENABLE_SHARE_YOUR_PROGRESS` to enable or disable the share your progress feature. ([#5727](https://github.com/argilla-io/argilla/pull/5727))
+
+## [2.5.0](https://github.com/argilla-io/argilla/compare/v2.4.1...v2.5.0)
+
 ### Added
 
 - Added new endpoints to create, update, ping and delete webhooks. ([#5453](https://github.com/argilla-io/argilla/pull/5453))
@@ -23,10 +36,13 @@ These are the section headers that we use:
 - Added new webhook events when datasets are created, updated, deleted or published. ([#5468](https://github.com/argilla-io/argilla/pull/5468))
 - Added new webhook events when records are created, updated, deleted or completed. ([#5489](https://github.com/argilla-io/argilla/pull/5489))
 - Added new `high` RQ queue to process high priority background jobs. ([#5467](https://github.com/argilla-io/argilla/pull/5467))
+- Added `users` attribute to the response of the endpoint `GET /api/v1/datasets/:dataset_id/progress`. ([#5701](https://github.com/argilla-io/argilla/pull/5701))
 
 ### Changed
 
+- API endpoint added to the User router to allow updates to User objects ([#5615](https://github.com/argilla-io/argilla/pull/5615))
 - Changed default python version to 3.13. ([#5649](https://github.com/argilla-io/argilla/pull/5649))
+- Changed Pydantic version to v2. ([#5666](https://github.com/argilla-io/argilla/pull/5666))
 
 ### Fixed
 
@@ -42,7 +58,7 @@ These are the section headers that we use:
 
 ### Added
 
-- Added new `POST /api/v1/datasets/:dataset_id/import` to import datasets from Hugging Face as a background job. ([#5572](https://github.com/argilla-io/argilla/pull/5572))
+- Added new `POST /api/v1/datasets/:dataset_id/import` endpoint to import datasets from Hugging Face as a background job. ([#5572](https://github.com/argilla-io/argilla/pull/5572))
 - Added new `metadata` attribute for endpoints getting, creating and updating Datasets so now it is possible to store metadata associated to a dataset. ([#5586](https://github.com/argilla-io/argilla/pull/5586))
 - Added new validation to avoid the creation of records with empty `fields` attributes. ([#5639](https://github.com/argilla-io/argilla/pull/5639))
 

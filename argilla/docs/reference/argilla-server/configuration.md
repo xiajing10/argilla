@@ -46,6 +46,8 @@ You can set the following environment variables to further configure your server
 
 - `ARGILLA_DOCS_ENABLED`: If False, disables openapi docs endpoint at _/api/docs_.
 
+- `ARGILLA_ENABLE_SHARE_YOUR_PROGRESS`: If True, enables the share your progress feature. This feature allows users to share their progress with the community. If False, the feature will be disabled.
+
 - `HF_HUB_DISABLE_TELEMETRY`: If True, disables telemetry for usage metrics. Alternatively, you can disable telemetry by setting `HF_HUB_OFFLINE=1`.
 
 #### Authentication
@@ -83,6 +85,10 @@ The following environment variables are useful only when PostgreSQL is used:
 - `ARGILLA_ELASTICSEARCH_SSL_VERIFY`: If "False", disables SSL certificate verification when connecting to the Elasticsearch backend.
 
 - `ARGILLA_ELASTICSEARCH_CA_PATH`: Path to CA cert for ES host. For example: `/full/path/to/root-ca.pem` (Optional)
+
+- `ARGILLA_ES_RECORDS_INDEX_SHARDS`: Default number of elasticsearch/opensearch shards for each search index. (Default: `1`).
+
+- `ARGILLA_ES_RECORDS_INDEX_REPLICAS`: Default number of elasticsearch/opensearch replicas for each search index. (Default: `0`).
 
 ### Redis
 

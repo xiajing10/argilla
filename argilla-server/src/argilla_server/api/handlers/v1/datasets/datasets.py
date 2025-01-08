@@ -30,6 +30,7 @@ from argilla_server.api.schemas.v1.datasets import (
     Datasets,
     DatasetUpdate,
     HubDataset,
+    HubDatasetExport,
     UsersProgress,
 )
 from argilla_server.api.schemas.v1.fields import Field, FieldCreate, Fields
@@ -38,6 +39,7 @@ from argilla_server.api.schemas.v1.metadata_properties import (
     MetadataProperty,
     MetadataPropertyCreate,
 )
+from argilla_server.errors.future import UnprocessableEntityError
 from argilla_server.api.schemas.v1.vector_settings import VectorSettings, VectorSettingsCreate, VectorsSettings
 from argilla_server.api.schemas.v1.jobs import Job as JobSchema
 from argilla_server.contexts import datasets
@@ -154,12 +156,12 @@ async def get_current_user_dataset_metrics(
 
     await authorize(current_user, DatasetPolicy.get(dataset))
 
-    result = await datasets.get_user_dataset_metrics(search_engine, current_user, dataset)
+    result = await datasets.get_user_dataset_metrics(db, search_engine, current_user, dataset)
 
     return DatasetMetrics(responses=result)
 
 
-@router.get("/datasets/{dataset_id}/progress", response_model=DatasetProgress)
+@router.get("/datasets/{dataset_id}/progress", response_model=DatasetProgress, response_model_exclude_unset=True)
 async def get_dataset_progress(
     *,
     dataset_id: UUID,
@@ -171,7 +173,7 @@ async def get_dataset_progress(
 
     await authorize(current_user, DatasetPolicy.get(dataset))
 
-    result = await datasets.get_dataset_progress(search_engine, dataset)
+    result = await datasets.get_dataset_progress(db, search_engine, dataset)
 
     return DatasetProgress(**result)
 
@@ -181,14 +183,13 @@ async def get_dataset_users_progress(
     *,
     dataset_id: UUID,
     db: AsyncSession = Depends(get_async_db),
-    search_engine: SearchEngine = Depends(get_search_engine),
     current_user: User = Security(auth.get_current_user),
 ):
     dataset = await Dataset.get_or_raise(db, dataset_id)
 
     await authorize(current_user, DatasetPolicy.get(dataset))
 
-    progress = await datasets.get_dataset_users_progress(dataset.id)
+    progress = await datasets.get_dataset_users_progress(db, dataset)
 
     return UsersProgress(users=progress)
 
@@ -330,6 +331,33 @@ async def import_dataset_from_hub(
         split=hub_dataset.split,
         dataset_id=dataset.id,
         mapping=hub_dataset.mapping.model_dump(),
+    )
+
+    return JobSchema(id=job.id, status=job.get_status())
+
+
+@router.post("/datasets/{dataset_id}/export", status_code=status.HTTP_202_ACCEPTED, response_model=JobSchema)
+async def export_dataset_to_hub(
+    *,
+    db: AsyncSession = Depends(get_async_db),
+    dataset_id: UUID,
+    hub_dataset: HubDatasetExport,
+    current_user: User = Security(auth.get_current_user),
+):
+    dataset = await Dataset.get_or_raise(db, dataset_id)
+
+    await authorize(current_user, DatasetPolicy.export_to_hub(dataset))
+
+    if not await datasets.dataset_has_records(db, dataset):
+        raise UnprocessableEntityError(f"Dataset with id `{dataset.id}` has no records to export")
+
+    job = hub_jobs.export_dataset_to_hub_job.delay(
+        name=hub_dataset.name,
+        subset=hub_dataset.subset,
+        split=hub_dataset.split,
+        private=hub_dataset.private,
+        token=hub_dataset.token,
+        dataset_id=dataset.id,
     )
 
     return JobSchema(id=job.id, status=job.get_status())

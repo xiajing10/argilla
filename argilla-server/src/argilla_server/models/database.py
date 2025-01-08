@@ -18,7 +18,7 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from sqlalchemy import Enum as SAEnum
+from sqlalchemy import Enum as SAEnum, PrimaryKeyConstraint
 from sqlalchemy import (
     JSON,
     ForeignKey,
@@ -63,6 +63,7 @@ __all__ = [
     "Vector",
     "VectorSettings",
     "Webhook",
+    "DatasetUser",
 ]
 
 _USER_API_KEY_BYTES_LENGTH = 80
@@ -83,20 +84,24 @@ class Field(DatabaseModel):
     __table_args__ = (UniqueConstraint("name", "dataset_id", name="field_name_dataset_id_uq"),)
 
     @property
-    def is_text(self):
+    def is_text(self) -> bool:
         return self.settings.get("type") == FieldType.text
 
     @property
-    def is_image(self):
+    def is_image(self) -> bool:
         return self.settings.get("type") == FieldType.image
 
     @property
-    def is_chat(self):
+    def is_chat(self) -> bool:
         return self.settings.get("type") == FieldType.chat
 
     @property
-    def is_custom(self):
+    def is_custom(self) -> bool:
         return self.settings.get("type") == FieldType.custom
+
+    @property
+    def type(self) -> FieldType:
+        return FieldType(self.settings["type"])
 
     def __repr__(self):
         return (
@@ -124,7 +129,7 @@ class Response(DatabaseModel):
     __upsertable_columns__ = {"values", "status"}
 
     @property
-    def is_submitted(self):
+    def is_submitted(self) -> bool:
         return self.status == ResponseStatus.submitted
 
     def __repr__(self):
@@ -306,8 +311,20 @@ class Question(DatabaseModel):
         return self.settings.get("type") == QuestionType.rating
 
     @property
+    def is_ranking(self) -> bool:
+        return self.settings.get("type") == QuestionType.ranking
+
+    @property
+    def is_span(self) -> bool:
+        return self.settings.get("type") == QuestionType.span
+
+    @property
     def type(self) -> QuestionType:
         return QuestionType(self.settings["type"])
+
+    @property
+    def values(self) -> List[Any]:
+        return [option["value"] for option in self.settings.get("options", [])]
 
     def __repr__(self):
         return (
@@ -331,8 +348,24 @@ class MetadataProperty(DatabaseModel):
     __table_args__ = (UniqueConstraint("name", "dataset_id", name="metadata_property_name_dataset_id_uq"),)
 
     @property
+    def is_terms(self) -> bool:
+        return self.settings.get("type") == MetadataPropertyType.terms
+
+    @property
+    def is_integer(self) -> bool:
+        return self.settings.get("type") == MetadataPropertyType.integer
+
+    @property
+    def is_float(self) -> bool:
+        return self.settings.get("type") == MetadataPropertyType.float
+
+    @property
     def type(self) -> MetadataPropertyType:
         return MetadataPropertyType(self.settings["type"])
+
+    @property
+    def values(self) -> List[Any]:
+        return self.settings.get("values", [])
 
     @property
     def parsed_settings(self) -> MetadataPropertySettings:
@@ -354,6 +387,28 @@ DatasetStatusEnum = SAEnum(DatasetStatus, name="dataset_status_enum")
 
 def _updated_at_current_value(context: DefaultExecutionContext) -> datetime:
     return context.get_current_parameters(isolate_multiinsert_groups=False)["updated_at"]
+
+
+class DatasetUser(DatabaseModel):
+    __tablename__ = "datasets_users"
+    __upsertable_columns__ = {}
+
+    id = None  # This is a workaround to avoid the id column in the table
+
+    dataset_id: Mapped[UUID] = mapped_column(ForeignKey("datasets.id", ondelete="CASCADE"), index=True)
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+
+    dataset: Mapped["Dataset"] = relationship(viewonly=True)
+    user: Mapped["User"] = relationship(viewonly=True)
+
+    __table_args__ = (PrimaryKeyConstraint("dataset_id", "user_id"),)
+
+    def __repr__(self):
+        return (
+            f"DatasetUser(id={str(self.id)!r}, dataset_id={str(self.dataset_id)!r}, "
+            f"user_id={str(self.user_id)!r}, "
+            f"inserted_at={str(self.inserted_at)!r}, updated_at={str(self.updated_at)!r})"
+        )
 
 
 class Dataset(DatabaseModel):
@@ -404,14 +459,21 @@ class Dataset(DatabaseModel):
         order_by=VectorSettings.inserted_at.asc(),
     )
 
+    users: Mapped[List["User"]] = relationship(
+        secondary="datasets_users",
+        back_populates="datasets",
+        passive_deletes=True,
+        order_by=DatasetUser.inserted_at.asc(),
+    )
+
     __table_args__ = (UniqueConstraint("name", "workspace_id", name="dataset_name_workspace_id_uq"),)
 
     @property
-    def is_draft(self):
+    def is_draft(self) -> bool:
         return self.status == DatasetStatus.draft
 
     @property
-    def is_ready(self):
+    def is_ready(self) -> bool:
         return self.status == DatasetStatus.ready
 
     @property
@@ -515,16 +577,22 @@ class User(DatabaseModel):
         order_by=Response.inserted_at.asc(),
     )
 
+    datasets: Mapped[List["Dataset"]] = relationship(
+        secondary="datasets_users",
+        back_populates="users",
+        order_by=DatasetUser.inserted_at.asc(),
+    )
+
     @property
-    def is_owner(self):
+    def is_owner(self) -> bool:
         return self.role == UserRole.owner
 
     @property
-    def is_admin(self):
+    def is_admin(self) -> bool:
         return self.role == UserRole.admin
 
     @property
-    def is_annotator(self):
+    def is_annotator(self) -> bool:
         return self.role == UserRole.annotator
 
     async def is_member(self, workspace_id: UUID) -> bool:

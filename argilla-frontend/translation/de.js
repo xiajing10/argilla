@@ -23,6 +23,7 @@ export default {
   description: "Beschreibung",
   labels: "Labels",
   order: "Reihenfolge",
+  owner: "Owner",
   useMarkdown: "Verwende Markdown",
   suggestionFirst: "Vorschlag zuerst",
   visibleForAnnotators: "Sichtbar für Annotatoren",
@@ -43,6 +44,8 @@ export default {
   required: "Erforderlich",
   optional: "Optional",
   template: "Template",
+  rows: "zeilen",
+  datasetName: "Dataset name",
   noRecordsMessages: {
     datasetEmptyForAnnotator:
       "Der Datensatz ist leer. Bitten Sie einen Administrator, Daten hochzuladen, und versuchen Sie es später erneut.",
@@ -229,6 +232,7 @@ export default {
   filters: "Filter",
   filterBy: "Filter nach...",
   fields: "Felder",
+  field: "Feld",
   questions: "Fragen",
   general: "Übersicht",
   metadata: "Metadaten",
@@ -249,16 +253,10 @@ export default {
   youAreOffline: "Sie sind offline",
   write: "Schreiben",
   preview: "Vorschau",
-  datasetTable: {
-    name: "Datensatz",
-    workspace: "Arbeitsbereich",
-    createdAt: "Erstellt am",
-    lastActivityAt: "Aktualisiert am",
-    progress: "Teamfortschritt",
-  },
   metrics: {
     total: "Total",
     progress: {
+      default: "Fortschritt",
       my: "mein Fortschritt",
       team: "Fortschritte im Team",
     },
@@ -289,6 +287,12 @@ export default {
         optionsWithoutLabel: "Optionen ohne Label sind nicht erlaubt",
         optionsSeparatedByComma: "Optionen müssen durch Kommas getrennt sein",
       },
+      rating: {
+        atLeastTwoOptions: "Mindestens zwei Optionen müssen vorhanden sein",
+      },
+      span: {
+        fieldRelated: "One text field is required",
+      },
     },
     atLeastOneQuestion: "Mindestens eine Frage wird benötigt",
     atLeastOneRequired: "Mindestens eine erforderliche Frage wird benötigt",
@@ -307,7 +311,8 @@ export default {
     requiredField: "Pflichtfeld",
     requiredQuestion: "Pflichtfrage",
     select: "Auswählen",
-    mapToColumn: "Einer Spalte zuordnen",
+    mapToColumn: "Annotate spans on:",
+    applyToaAField: "Gelten für:",
     subset: "Teilmenge",
     selectSubset:
       "Sie können einen Datensatz nur aus einer Teilmenge erstellen.",
@@ -319,6 +324,23 @@ export default {
     none: "Keine",
     noWorkspaces:
       "Bitte folgen Sie der <a target='_blank' href='https://docs.argilla.io/latest/how_to_guides/workspace/#create-a-new-workspace'>Anleitung</a>, um einen Workspace zu erstellen",
+  },
+  exportToHub: {
+    dialogTitle: "Drücken",
+    ownerTooltip:
+      "Verwenden Sie einen gültigen Hugging Face-Benutzernamen oder eine Organisation",
+    tokenTooltip: `Verwenden Sie ein vorhandenes Zugriffstoken oder erstellen Sie ein <a href='https://huggingface.co/settings/tokens' target='_blank'>neues Token</a> mit "Schreibberechtigung"`,
+    validations: {
+      orgOrUsernameIsRequired:
+        "Organisation oder Benutzername sind erforderlich",
+      hfTokenIsRequired: "Umarmen des Gesichts -Tokens ist erforderlich ",
+      hfTokenInvalid: "Ungültiges Umarmungs -Gesichts -Token ",
+      datasetNameIsRequired: "Datensatzname ist erforderlich ",
+    },
+    exporting: "Exportieren in den Umarmungsgesichtszentrum ",
+    private: "Privater Datensatz",
+    public: "Öffentlicher Datensatz",
+    exportingWarning: "Das kann ein paar Sekunden dauern",
   },
   config: {
     field: {
